@@ -1,3 +1,11 @@
+# This accompanies a paper on Common Shelduck abundance in Borgarfjordur in 
+# western Iceland. It should be read in conjunction with scripts on 
+# and model_selection and model_validation. 
+
+
+# Niall Tierney and Sunny Townsend
+# 15 May 2020
+
 library(dplyr)
 
 ## import data
