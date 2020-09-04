@@ -15,26 +15,52 @@ shelducks = read.csv("data/shelduck_counts.csv") %>%
   as_tibble()
 
 #changing the subsite column in shelducks to be a factor, not an integer 
+shelducks$tide = as.factor(shelducks$tide)
 shelducks$subsite=as.factor(shelducks$subsite)
 
 
 #Best Model based on model_selection.R
 
 best = gam(count ~ s(week) +
-           s(week, by = as.numeric(subsite %in% c(2, 3))) +
-           subsite * tide +
-           offset(area),
-         family = ziP,
-         data = shelducks)
+             subsite * tide +
+             offset(area),
+           family = ziP,
+           data = shelducks)
 
 summary(best)
 
 
-# fitted values for each
+# fitted values and residuals
 shelducks$fitted = predict(best, type = "response")
+shelducks$devres = resid(best, type = "deviance")
 
-## Plot the observed points and fitted line for each subsite and tide 
-# variable by week
+
+# Validation plots ----
+
+# residual plots
+
+png("FigA1.png", height = 6, width = 6, units="in", res=300)
+par (mfrow=c(2,2), mar=c(4,4,1,1), xpd=T) 
+plot(shelducks$fitted, shelducks$devres,
+     xlab = "fitted values",
+     ylab="deviance residuals")
+text(-170, 30, "a)", cex=1.2)
+plot(shelducks$week, shelducks$devres,
+     xlab = "week",
+     ylab="deviance residuals")
+text(2, 30, "b)", cex=1.2)
+plot(shelducks$tide, shelducks$devres,
+     xlab = "tidal state",
+     ylab="deviance residuals")
+text(0, 30, "c)", cex=1.2)
+plot(shelducks$subsite, shelducks$devres,
+     xlab = "subarea",
+     ylab="deviance residuals")
+text(-1, 30, "d)", cex=1.2)
+dev.off()
+
+
+# observed vs fitted
 
 # function to plot observed and fitted on same graph
 plot_model_fit <- function(tide_level, subsite_level){
@@ -44,6 +70,8 @@ plot_model_fit <- function(tide_level, subsite_level){
   with(data_to_plot, lines(week, fitted, col="red"))
 }
 
+
+png("FigA2.png", height = 6, width = 6, units="in", res=300)
 par (mfrow=c(6,2), mar=c(2,2,1,1))
 plot_model_fit(tide_level="low", subsite_level = 1)
 plot_model_fit(tide_level="rising", subsite_level = 1)
@@ -57,14 +85,5 @@ plot_model_fit(tide_level="low", subsite_level = 5)
 plot_model_fit(tide_level="rising", subsite_level = 5)
 plot_model_fit(tide_level="low", subsite_level = 6)
 plot_model_fit(tide_level="rising", subsite_level = 6)
-
-
-# Validation plots
-devres = resid(best, type = "deviance")
-fitted = predict(best, type = "response")
-par (mfrow=c(2,2)) 
-plot(fitted, devres)
-plot(shelducks$week, devres)
-plot(shelducks$tide, devres)
-plot(shelducks$subsite, devres)
+dev.off()
 

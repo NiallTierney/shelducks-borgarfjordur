@@ -14,6 +14,7 @@ shelducks = read.csv("data/shelduck_counts.csv") %>%
   as_tibble()
 
 #changing the subsite column in shelducks to be a factor, not an integer 
+shelducks$tide = as.factor(shelducks$tide)
 shelducks$subsite=as.factor(shelducks$subsite)
 
 #Model selection ----
@@ -57,8 +58,23 @@ m9 = gam(count ~ s(week) +
           family = ziP,
           data = shelducks)
 
+m10 = gam(count ~ s(week) +
+           s(week, by = as.numeric(subsite %in% c(2, 4))) +
+           subsite * tide +
+           offset(area),
+         family = ziP,
+         data = shelducks)
 
-AIC(m1, m2, m3, m4, m5, m6, m7, m8, m9)
+m11 = gam(count ~ s(week) +
+            s(week, by = as.numeric(subsite %in% c(2, 3, 4))) +
+            subsite * tide +
+            offset(area),
+          family = ziP,
+          data = shelducks)
+
+
+summary(m1)
+AIC(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11)
 
 
 

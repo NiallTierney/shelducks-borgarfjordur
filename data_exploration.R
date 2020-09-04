@@ -17,8 +17,9 @@ shelducks = read.csv("data/shelduck_counts.csv") %>%
 hist(shelducks$count, breaks=100)
 
 plot(shelducks$week, shelducks$count, xlab="Week", ylab="Number of birds")
+shelducks$tide = as.factor(shelducks$tide)
 plot(shelducks$tide, shelducks$count, xlab="Tidal state", 
-ylab="Number of birds")
+     ylab="Number of birds")
 shelducks$subsite = as.factor(shelducks$subsite)
 plot(shelducks$subsite, shelducks$count, xlab="Subsite", 
      ylab="Number of birds")
